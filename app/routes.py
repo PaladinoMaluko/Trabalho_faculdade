@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app.models import db, Produto, Eletronico, EletronicoDomestico, EletronicoIndustrial, EletronicoInteligente
+from app.models import db, Produto, Eletronico, EletronicoDomestico, EletronicoIndustrial, EletronicoInteligente, Venda, Registro
 
 bp = Blueprint('api', __name__)
 
@@ -37,6 +37,23 @@ def buscar_eletronico_ou_erro(id):
         return None, (jsonify({"erro": "Eletronico não encontrado"}), 404)
 
     return eletronico, None
+
+def buscar_venda_ou_erro(id):
+    """
+    Busca uma venda pelo ID.
+    Retorna (venda, None) se encontrar.
+    Retorna (None, (json, status)) se não encontrar ou der erro.
+    """
+    try:
+        venda = db.session.get(Venda, id)
+    except Exception as e:
+        print(f"Erro ao buscar venda: {e}")
+        return None, (jsonify({"erro": "Erro interno"}), 500)
+
+    if venda is None:
+        return None, (jsonify({"erro": "Venda não encontrada"}), 404)
+
+    return venda, None
 
 
 @bp.route('/', methods=['GET'])
@@ -377,3 +394,88 @@ def excluir_eletronico(id):
 
     return jsonify({"mensagem": "Eletronico excluído com sucesso"}), 200
 
+
+# ---- ROTAS DE ACESSO DE VENDAS ----
+@bp.route('/vendas', methods=['GET'])
+def listar_venda():
+    """Rota para listar todas as vendas"""
+    try:
+        vendas = Venda.query.all()
+
+        return jsonify([venda.to_dict() for venda in vendas]), 200
+    except Exception as e:
+        print(f"Erro ao listar vendas: {e}")
+        return jsonify({"erro": "Erro interno ao listar vendas"}), 500
+
+
+@bp.route("/vendas/<int:id>", methods=["GET"])
+def obter_venda(id):
+    """Rota para obter uma venda pelo ID"""
+    venda, erro = buscar_venda_ou_erro(id)
+    
+    if erro:
+        return erro
+
+    return jsonify(venda.to_dict()), 200
+
+
+@bp.route("/vendas", methods=["POST"])
+def criar_venda():
+    """Rota para criar uma nova venda"""
+    dados = request.get_json()
+
+    if not dados:
+        return jsonify({"erro": "JSON não informado"}, 400)
+
+    if "id_produto" not in dados or "quantidade" not in dados or "preco_unitario" not in dados:
+        return jsonify({"erro": "Os campos são obrigatórios"}), 400
+
+    # Verifica se existe um produto 
+    id_produto = dados["id_produto"]
+    produto, erro = buscar_produto_ou_erro(id_produto)
+    if erro:
+        return erro
+    
+    if dados["quantidade"] <= 0 or dados["preco_unitario"] <= 0:
+        return jsonify({"erro": "Quantidade e preço devem ser maiores que zero"}), 400
+
+    venda = Venda(id_produto=id_produto, quantidade=dados["quantidade"], preco_unitario=dados["preco_unitario"], valor_total=dados["quantidade"] * dados["preco_unitario"])
+
+    try:
+        db.session.add(venda)
+        db.session.flush()   
+
+        registro = Registro(
+            tipo_evento="VENDA",
+            entidade="Venda",
+            id_entidade=venda.id,
+            descricao=f"Venda de {dados['quantidade']}x {produto.nome} por R$ {venda.valor_total}"
+        )
+
+        db.session.add(registro)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao criar venda: {e}")
+        return jsonify({"erro": "Erro interno ao criar venda"}), 500
+
+    return jsonify(venda.to_dict()), 201
+
+@bp.route("/vendas/<int:id>", methods=["DELETE"])
+def excluir_venda(id):
+    """Rota para excluir uma venda existente"""
+    venda, erro = buscar_venda_ou_erro(id)
+        
+    if erro:
+        return erro
+
+    try:
+        db.session.delete(venda)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao deletar venda: {e}")
+        return jsonify({"erro": "Erro interno ao deletar venda"}), 500
+    
+
+    return jsonify({"mensagem": "Venda excluída com sucesso"}), 200

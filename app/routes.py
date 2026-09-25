@@ -55,6 +55,32 @@ def buscar_venda_ou_erro(id):
 
     return venda, None
 
+def buscar_registro_ou_erro(id):
+    """
+    Busca um registro por ID.
+    Retorna (registro, None) se encontrar.
+    Retorna (None, (json, status)) se não encontrar ou der erro.
+    """
+    try:
+        registro = db.session.get(Registro, id)
+    except Exception as e:
+        print(f"Erro ao buscar registro: {e}")
+        return None, (jsonify({"erro": "Erro registro"}), 500)
+
+    if registro is None:
+        return None, (jsonify({"erro": "Registro não encontrada"}), 404)
+
+    return registro, None
+
+def criar_registro(tipo_evento, entidade, id_entidade, descricao):
+    """Função para criar um registro para cada evento"""
+    registro = Registro(
+        tipo_evento=tipo_evento,
+        entidade=entidade,
+        id_entidade=id_entidade,
+        descricao=descricao
+    )
+    db.session.add(registro)
 
 @bp.route('/', methods=['GET'])
 def index():
@@ -67,7 +93,7 @@ def listar_produto():
     """Rota para listar todos os produtos"""
     try:
         produtos = Produto.query.all()
-
+        
         return jsonify([produto.to_dict() for produto in produtos]), 200
     except Exception as e:
         print(f"Erro ao listar produtos: {e}")
@@ -125,6 +151,16 @@ def criar_produto():
 
     try:
         db.session.add(produto)
+        db.session.flush()
+
+        # Registrando a criação de produto
+        criar_registro(
+            tipo_evento="CRIACAO",
+            entidade="Produto",
+            id_entidade=produto.id,
+            descricao=f"Produto '{produto.nome}' criado com preço R$ {produto.preco}"
+        )
+
         db.session.commit()
     except Exception as e:
         db.session.rollback()
@@ -153,6 +189,14 @@ def atualizar_produto(id):
             if campo in dados:
                 setattr(produto, campo, dados[campo])
 
+        # Registrando a atualização de produto
+        criar_registro(
+            tipo_evento="ATUALIZACAO",
+            entidade="Produto",
+            id_entidade=produto.id,
+            descricao=f"Produto atualizado: nome->{produto.nome}, preco->{produto.preco}, qtd->{produto.qtd}"
+        )
+        
         db.session.commit()
     except Exception as e:
         db.session.rollback()
@@ -171,6 +215,14 @@ def excluir_produto(id):
         return erro
 
     try:
+        # Registrando a exclusão de produto
+        criar_registro(
+            tipo_evento="EXCLUSAO",
+            entidade="Produto",
+            id_entidade=produto.id,
+            descricao=f"Produto deletado: {produto.nome}"
+        )
+
         db.session.delete(produto)
         db.session.commit()
     except Exception as e:
@@ -445,14 +497,13 @@ def criar_venda():
         db.session.add(venda)
         db.session.flush()   
 
-        registro = Registro(
+        criar_registro(
             tipo_evento="VENDA",
             entidade="Venda",
             id_entidade=venda.id,
             descricao=f"Venda de {dados['quantidade']}x {produto.nome} por R$ {venda.valor_total}"
         )
 
-        db.session.add(registro)
         db.session.commit()
     except Exception as e:
         db.session.rollback()
@@ -479,3 +530,44 @@ def excluir_venda(id):
     
 
     return jsonify({"mensagem": "Venda excluída com sucesso"}), 200
+
+
+# ---- ROTAS DE REGISTROS ----
+@bp.route('/registros', methods=['GET'])
+def listar_registro():
+    """Rota para listar todos os registros"""
+    try:
+        query = Registro.query
+
+        # Filtrar por ordem desc a data e hora de cada registro
+        ordem = request.args.get("ordem", "desc") 
+        if ordem == "asc":
+            query = query.order_by(Registro.data_hora.asc())
+        else:
+            query = query.order_by(Registro.data_hora.desc())
+
+        # Filtrar por tipo de entidade (venda ou produto)
+        tipo_evento = request.args.get("tipo_evento")   
+        entidade = request.args.get("entidade")         
+
+        if tipo_evento:
+            query = query.filter(Registro.tipo_evento == tipo_evento)
+
+        if entidade:
+            query = query.filter(Registro.entidade == entidade)
+
+        registros = query.all()
+
+        return jsonify([registro.to_dict() for registro in registros]), 200
+    except Exception as e:
+        print(f"Erro ao listar registro: {e}")
+        return jsonify({"erro": "Erro interno ao listar registro"}), 500
+
+@bp.route("/registros/<int:id>", methods=["GET"])
+def obter_registro(id):
+    registro, erro = buscar_registro_ou_erro(id)
+    
+    if erro:
+        return erro
+
+    return jsonify(registro.to_dict()), 200

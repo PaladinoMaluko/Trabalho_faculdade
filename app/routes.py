@@ -269,7 +269,7 @@ def criar_eletronico():
 
     # Verifica se existe um produto que seja um eletronico
     id_produto = dados["id_produto"]
-    _, erro = buscar_produto_ou_erro(id_produto)
+    produto, erro = buscar_produto_ou_erro(id_produto)
     if erro:
         return erro
 
@@ -281,6 +281,15 @@ def criar_eletronico():
     db.session.add(eletronico)
     # Evita fechar a transição 
     db.session.flush()
+
+    # Registrando a criação de eletronico
+    criar_registro(
+        tipo_evento="CRIACAO",
+        entidade="Eletronico",
+        id_entidade=eletronico.id,
+        descricao=f"Eletronico '{dados['marca']} {dados['modelo']}' criado para produto '{produto.nome}'"
+    )
+
 
     # Criando o subtipo do eletronico
     subtipo = dados.get("subtipo")   
@@ -331,11 +340,13 @@ def atualizar_eletronico(id):
     tem_campo_subtipo = "subtipo" in dados
 
     try:
+        partes = []
         campos_permitidos = ["marca", "modelo"]
 
         for campo in campos_permitidos:
             if campo in dados:
                 setattr(eletronico, campo, dados[campo])
+                partes.append(f"{campo} alterado")
 
         if not tem_campo_subtipo:
             # cliente não mandou "subtipo" -> não mexe
@@ -345,10 +356,13 @@ def atualizar_eletronico(id):
             # cliente mandou "subtipo": null -> remove o subtipo atual
             if eletronico.eletronicodomestico:
                 db.session.delete(eletronico.eletronicodomestico)
+                partes.append("subtipo doméstico removido")
             elif eletronico.eletronicoindustrial:
                 db.session.delete(eletronico.eletronicoindustrial)
+                partes.append("subtipo industrial removido")
             elif eletronico.eletronicointeligente:
                 db.session.delete(eletronico.eletronicointeligente)
+                partes.append("subtipo inteligente removido")
 
         elif subtipo_novo == "domestico":
             if eletronico.eletronicodomestico:
@@ -356,6 +370,8 @@ def atualizar_eletronico(id):
                 for campo in ["cor", "material"]:
                     if campo in dados:
                         setattr(eletronico.eletronicodomestico, campo, dados[campo])
+                partes.append("subtipo doméstico atualizado")
+    
             elif eletronico.eletronicoindustrial or eletronico.eletronicointeligente:
                 # já tem outro subtipo -> erro
                 db.session.rollback()
@@ -368,6 +384,7 @@ def atualizar_eletronico(id):
                     material=dados.get("material")
                 )
                 db.session.add(domestico)
+                partes.append("subtipo doméstico criado")
 
         elif subtipo_novo == "industrial":
             if eletronico.eletronicoindustrial:
@@ -375,6 +392,7 @@ def atualizar_eletronico(id):
                 for campo in ["nicho", "material"]:
                     if campo in dados:
                         setattr(eletronico.eletronicoindustrial, campo, dados[campo])
+                partes.append("subtipo industrial atualizado")
             elif eletronico.eletronicodomestico or eletronico.eletronicointeligente:
                 # já tem outro subtipo -> erro
                 db.session.rollback()
@@ -387,6 +405,7 @@ def atualizar_eletronico(id):
                     material=dados.get("material")
                 )
                 db.session.add(industrial)
+                partes.append("subtipo industrial criado")
             
         elif subtipo_novo == "inteligente":
             if eletronico.eletronicointeligente:
@@ -394,6 +413,8 @@ def atualizar_eletronico(id):
                 for campo in ["conectividade"]:
                     if campo in dados:
                         setattr(eletronico.eletronicointeligente, campo, dados[campo])
+                partes.append("subtipo inteligente atualizado")
+                    
             elif eletronico.eletronicoindustrial or eletronico.eletronicodomestico:
                 # já tem outro subtipo -> erro
                 db.session.rollback()
@@ -405,10 +426,20 @@ def atualizar_eletronico(id):
                     conectividade=dados.get("conectividade")
                 )
                 db.session.add(inteligente)
+                partes.append("subtipo inteligente criado")
         else:
             # subtipo inválido (string diferente das três válidas)
             db.session.rollback()
             return jsonify({"erro": "Subtipo inválido. Use 'domestico', 'industrial' ou 'inteligente'"}), 400
+
+        if partes:
+            # Registra todas as mudanças feitas (incluindo os do subtipos)
+            criar_registro(
+                tipo_evento="ATUALIZACAO",
+                entidade="Eletronico",
+                id_entidade=eletronico.id,
+                descricao=f"Eletronico '{eletronico.marca} {eletronico.modelo}' atualizado: {', '.join(partes)}"
+            )
 
         db.session.commit()
     except Exception as e:
@@ -435,6 +466,14 @@ def excluir_eletronico(id):
             db.session.delete(eletronico.eletronicoindustrial)
         elif eletronico.eletronicointeligente:
             db.session.delete(eletronico.eletronicointeligente)
+
+        # Registrando a exclusão de eletronico
+        criar_registro(
+            tipo_evento="EXCLUSAO",
+            entidade="Eletronico",
+            id_entidade=eletronico.id,
+            descricao=f"Eletronico deletado: {eletronico.marca} {eletronico.modelo}"
+        )
 
         db.session.delete(eletronico)
         db.session.commit()
@@ -497,6 +536,7 @@ def criar_venda():
         db.session.add(venda)
         db.session.flush()   
 
+        # Registrando a venda
         criar_registro(
             tipo_evento="VENDA",
             entidade="Venda",
@@ -521,6 +561,15 @@ def excluir_venda(id):
         return erro
 
     try:
+
+        # Registrando o cancelamento da venda
+        criar_registro(
+            tipo_evento="CANCELAMENTO",
+            entidade="Venda",
+            id_entidade=venda.id,
+            descricao=f"Venda #{venda.id} cancelada (era {venda.quantidade}x produto {venda.id_produto})"
+        )
+
         db.session.delete(venda)
         db.session.commit()
     except Exception as e:

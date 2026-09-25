@@ -45,7 +45,10 @@ class Eletronico(db.Model):
             "id": self.id,
             "id_produto": self.id_produto,
             "marca": self.marca,
-            "modelo": self.modelo
+            "modelo": self.modelo,
+            "eletronicodomestico": self.eletronicodomestico.to_dict() if self.eletronicodomestico else None,
+            "eletronicoindustrial": self.eletronicoindustrial.to_dict() if self.eletronicoindustrial else None,
+            "eletronicointeligente": self.eletronicointeligente.to_dict() if self.eletronicointeligente else None
         }
 
 

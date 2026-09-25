@@ -614,9 +614,104 @@ def listar_registro():
 
 @bp.route("/registros/<int:id>", methods=["GET"])
 def obter_registro(id):
+    """Rota para obter um registro pelo ID"""
     registro, erro = buscar_registro_ou_erro(id)
     
     if erro:
         return erro
 
     return jsonify(registro.to_dict()), 200
+
+
+# ---- ROTAS DE RELATÓRIOS ----
+@bp.route('/relatorios/faturamento-total', methods=['GET'])
+def relatorio_faturamento_total():
+    """Retorna a soma total de todas as vendas."""
+    try:
+        total = db.session.query(db.func.sum(Venda.valor_total)).scalar()
+        
+        # Se não houver vendas, total será None 
+        if total is None:
+            total = 0
+        
+        return jsonify({"faturamento_total": total}), 200
+    except Exception as e:
+        print(f"Erro ao calcular faturamento total: {e}")
+        return jsonify({"erro": "Erro interno ao calcular faturamento"}), 500
+
+
+@bp.route('/relatorios/produto-mais-vendido', methods=['GET'])
+def relatorio_produto_mais_vendido():
+    """Retorna o produto com a maior soma de quantidade vendida."""
+    try:
+        resultado = db.session.query(
+            Venda.id_produto,
+            db.func.sum(Venda.quantidade).label("total_vendido"),
+            db.func.sum(Venda.valor_total).label("faturamento")
+        ).group_by(Venda.id_produto)\
+         .order_by(db.func.sum(Venda.quantidade).desc())\
+         .first()
+        
+        if resultado is None:
+            return jsonify({"mensagem": "Nenhuma venda registrada"}), 200
+        
+        # Busca o nome do produto
+        produto = db.session.get(Produto, resultado.id_produto)
+        
+        return jsonify({
+            "id": resultado.id_produto,
+            "nome": produto.nome if produto else "Produto removido",
+            "total_vendido": resultado.total_vendido,
+            "faturamento": resultado.faturamento
+        }), 200
+    except Exception as e:
+        print(f"Erro ao calcular produto mais vendido: {e}")
+        return jsonify({"erro": "Erro interno ao calcular relatório"}), 500
+
+
+@bp.route('/relatorios/vendas-por-produto', methods=['GET'])
+def relatorio_vendas_por_produto():
+    """Lista todos os produtos com total vendido e faturamento."""
+    try:
+        resultados = db.session.query(
+            Venda.id_produto,
+            db.func.sum(Venda.quantidade).label("total_vendido"),
+            db.func.sum(Venda.valor_total).label("faturamento")
+        ).group_by(Venda.id_produto)\
+         .order_by(db.func.sum(Venda.quantidade).desc())\
+         .all()
+        
+        relatorio = []
+        for r in resultados:
+            produto = db.session.get(Produto, r.id_produto)
+            relatorio.append({
+                "id": r.id_produto,
+                "nome": produto.nome if produto else "Produto removido",
+                "total_vendido": r.total_vendido,
+                "faturamento": r.faturamento
+            })
+        
+        return jsonify(relatorio), 200
+    except Exception as e:
+        print(f"Erro ao gerar relatório de vendas por produto: {e}")
+        return jsonify({"erro": "Erro interno ao gerar relatório"}), 500
+
+
+@bp.route('/relatorios/movimentacoes-por-tipo', methods=['GET'])
+def relatorio_movimentacoes_por_tipo():
+    """Conta quantos registros existem por tipo de evento."""
+    try:
+        resultados = db.session.query(
+            Registro.tipo_evento,
+            db.func.count(Registro.id).label("total")
+        ).group_by(Registro.tipo_evento)\
+         .order_by(db.func.count(Registro.id).desc())\
+         .all()
+        
+        return jsonify([
+            {"tipo_evento": r.tipo_evento, "total": r.total}
+            for r in resultados
+        ]), 200
+    except Exception as e:
+        print(f"Erro ao gerar relatório de movimentações: {e}")
+        return jsonify({"erro": "Erro interno ao gerar relatório"}), 500

@@ -16,6 +16,15 @@ class Produto(db.Model):
     vendas = db.relationship("Venda", back_populates="produto")
 
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "nome": self.nome,
+            "preco": self.preco,
+            "qtd": self.qtd
+        }
+
+
 class Eletronico(db.Model):
     """Representa um tipo de produto."""
     __tablename__ = 'eletronico'
@@ -32,6 +41,17 @@ class Eletronico(db.Model):
     eletronicoindustrial = db.relationship("EletronicoIndustrial", back_populates="eletronico", uselist=False)
     eletronicointeligente = db.relationship("EletronicoInteligente", back_populates="eletronico", uselist=False)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "id_produto": self.id_produto,
+            "marca": self.marca,
+            "modelo": self.modelo,
+            "eletronicodomestico": self.eletronicodomestico.to_dict() if self.eletronicodomestico else None,
+            "eletronicoindustrial": self.eletronicoindustrial.to_dict() if self.eletronicoindustrial else None,
+            "eletronicointeligente": self.eletronicointeligente.to_dict() if self.eletronicointeligente else None
+        }
+
 
 # Subcategorias de Eletronicos
 # -----------------------------------------
@@ -45,6 +65,14 @@ class EletronicoDomestico(db.Model):
 
     # Definindo relações
     eletronico = db.relationship("Eletronico", back_populates="eletronicodomestico", uselist=False)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "id_eletronico": self.id_eletronico,
+            "cor": self.cor,
+            "material": self.material
+        }
 
 
 class EletronicoIndustrial(db.Model):
@@ -58,6 +86,14 @@ class EletronicoIndustrial(db.Model):
     # Definindo relações
     eletronico = db.relationship("Eletronico", back_populates="eletronicoindustrial", uselist=False)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "id_eletronico": self.id_eletronico,
+            "nicho": self.nicho,
+            "material": self.material
+        }
+
 
 class EletronicoInteligente(db.Model):
     """Representa um subtipo de produto do tipo eletronico."""
@@ -68,6 +104,13 @@ class EletronicoInteligente(db.Model):
 
     # Definindo relações
     eletronico = db.relationship("Eletronico", back_populates="eletronicointeligente", uselist=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "id_eletronico": self.id_eletronico,
+            "conectividade": self.conectividade
+        }
 # -----------------------------------------
 
 
@@ -81,6 +124,16 @@ class Registro(db.Model):
     id_entidade = db.Column(db.Integer, nullable=False)
     descricao = db.Column(db.String)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "data_hora": self.data_hora.isoformat() if self.data_hora else None,
+            "tipo_evento": self.tipo_evento,
+            "entidade": self.entidade,
+            "id_entidade": self.id_entidade,
+            "descricao": self.descricao
+        }
+
 class Venda(db.Model):
     """Registros das vendas."""
     __tablename__ = 'venda'
@@ -92,4 +145,14 @@ class Venda(db.Model):
     valor_total = db.Column(db.Integer)  # opcional
 
     produto = db.relationship("Produto", back_populates="vendas")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "id_produto": self.id_produto,
+            "quantidade": self.quantidade,
+            "preco_unitario": self.preco_unitario,
+            "data_venda": self.data_venda.isoformat() if self.data_venda else None,
+            "valor_total": self.valor_total
+        }
 

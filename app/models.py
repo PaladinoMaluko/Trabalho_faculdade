@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
+
 class Produto(db.Model):
     """Representa um produto genérico."""
     __tablename__ = 'produto'

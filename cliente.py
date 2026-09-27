@@ -1,5 +1,5 @@
 
-import api_cliente
+import app.client.api_client as api_client
 
 # FUNÇÕES AUXILIARES
 
@@ -53,14 +53,14 @@ def menu_produtos():
         try:
 
             if opcao == "1":
-                produtos = api_cliente.listar_produto()
+                produtos = api_client.listar_produto()
                 mostrar_dados(produtos)
                 pausar()
 
             elif opcao == "2":
                 id_produto = int(input("Digite o ID do produto: "))
 
-                produto = api_cliente.obter_produto(id_produto)
+                produto = api_client.obter_produto(id_produto)
 
                 if produto is None:
                     print("\nProduto não encontrado.")
@@ -72,7 +72,7 @@ def menu_produtos():
             elif opcao == "3":
                 nome = input("Digite o nome do produto: ")
 
-                produtos = api_cliente.buscar_produto(nome)
+                produtos = api_client.buscar_produto(nome)
 
                 mostrar_dados(produtos)
 
@@ -83,7 +83,7 @@ def menu_produtos():
                 preco = int(input("Preço: "))
                 qtd = int(input("Quantidade: "))
 
-                produto = api_cliente.criar_produto(
+                produto = api_client.criar_produto(
                     nome,
                     preco,
                     qtd
@@ -119,7 +119,7 @@ def menu_produtos():
                 if not dados:
                     print("\nNenhum dado informado.")
                 else:
-                    produto = api_cliente.atualizar_produto(
+                    produto = api_client.atualizar_produto(
                         id_produto,
                         dados
                     )
@@ -143,7 +143,7 @@ def menu_produtos():
 
                 if confirmar.lower() == "s":
 
-                    excluido = api_cliente.excluir_produto(
+                    excluido = api_client.excluir_produto(
                         id_produto
                     )
 
@@ -194,7 +194,7 @@ def menu_eletronicos():
         try:
 
             if opcao == "1":
-                eletronicos = api_cliente.listar_eletronico()
+                eletronicos = api_client.listar_eletronico()
 
                 mostrar_dados(eletronicos)
 
@@ -205,7 +205,7 @@ def menu_eletronicos():
                     input("ID do eletrônico: ")
                 )
 
-                eletronico = api_cliente.obter_eletronico(
+                eletronico = api_client.obter_eletronico(
                     id_eletronico
                 )
 
@@ -240,7 +240,7 @@ def menu_eletronicos():
                     cor = input("Cor: ")
                     material = input("Material: ")
 
-                    eletronico = api_cliente.criar_eletronico(
+                    eletronico = api_client.criar_eletronico(
                         id_produto,
                         marca,
                         modelo,
@@ -254,7 +254,7 @@ def menu_eletronicos():
                     nicho = input("Nicho: ")
                     material = input("Material: ")
 
-                    eletronico = api_cliente.criar_eletronico(
+                    eletronico = api_client.criar_eletronico(
                         id_produto,
                         marca,
                         modelo,
@@ -273,7 +273,7 @@ def menu_eletronicos():
                         conectividade.lower() == "s"
                     )
 
-                    eletronico = api_cliente.criar_eletronico(
+                    eletronico = api_client.criar_eletronico(
                         id_produto,
                         marca,
                         modelo,
@@ -283,7 +283,7 @@ def menu_eletronicos():
 
                 elif subtipo_opcao == "4":
 
-                    eletronico = api_cliente.criar_eletronico(
+                    eletronico = api_client.criar_eletronico(
                         id_produto,
                         marca,
                         modelo
@@ -329,7 +329,7 @@ def menu_eletronicos():
                     print("\nNenhum dado informado.")
                 else:
 
-                    eletronico = api_cliente.atualizar_eletronico(
+                    eletronico = api_client.atualizar_eletronico(
                         id_eletronico,
                         dados
                     )
@@ -359,7 +359,7 @@ def menu_eletronicos():
 
                 if confirmar.lower() == "s":
 
-                    excluido = api_cliente.excluir_eletronico(
+                    excluido = api_client.excluir_eletronico(
                         id_eletronico
                     )
 
@@ -411,7 +411,7 @@ def menu_vendas():
 
             if opcao == "1":
 
-                vendas = api_cliente.listar_venda()
+                vendas = api_client.listar_venda()
 
                 mostrar_dados(vendas)
 
@@ -423,7 +423,7 @@ def menu_vendas():
                     input("ID da venda: ")
                 )
 
-                venda = api_cliente.obter_venda(
+                venda = api_client.obter_venda(
                     id_venda
                 )
 
@@ -448,7 +448,7 @@ def menu_vendas():
                     input("Preço unitário: ")
                 )
 
-                venda = api_cliente.criar_venda(
+                venda = api_client.criar_venda(
                     id_produto,
                     quantidade,
                     preco
@@ -472,7 +472,7 @@ def menu_vendas():
 
                 if confirmar.lower() == "s":
 
-                    excluido = api_cliente.excluir_venda(
+                    excluido = api_client.excluir_venda(
                         id_venda
                     )
 
@@ -528,7 +528,7 @@ def menu_registros():
 
             if opcao == "1":
 
-                registros = api_cliente.listar_registro()
+                registros = api_client.listar_registro()
 
                 mostrar_dados(registros)
 
@@ -541,7 +541,7 @@ def menu_registros():
                     "EXCLUSAO, VENDA, CANCELAMENTO): "
                 )
 
-                registros = api_cliente.listar_registro(
+                registros = api_client.listar_registro(
                     tipo_evento=tipo
                 )
 
@@ -555,7 +555,7 @@ def menu_registros():
                     "Entidade (Produto, Eletronico, Venda): "
                 )
 
-                registros = api_cliente.listar_registro(
+                registros = api_client.listar_registro(
                     entidade=entidade
                 )
 
@@ -565,7 +565,7 @@ def menu_registros():
 
             elif opcao == "4":
 
-                registros = api_cliente.listar_registro(
+                registros = api_client.listar_registro(
                     ordem="asc"
                 )
 
@@ -575,7 +575,7 @@ def menu_registros():
 
             elif opcao == "5":
 
-                registros = api_cliente.listar_registro(
+                registros = api_client.listar_registro(
                     ordem="desc"
                 )
 
@@ -589,7 +589,7 @@ def menu_registros():
                     input("ID do registro: ")
                 )
 
-                registro = api_cliente.obter_registro(
+                registro = api_client.obter_registro(
                     id_registro
                 )
 
@@ -642,7 +642,7 @@ def menu_relatorios():
             if opcao == "1":
 
                 resultado = (
-                    api_cliente.relatorio_faturamento()
+                    api_client.relatorio_faturamento()
                 )
 
                 mostrar_dados(resultado)
@@ -652,7 +652,7 @@ def menu_relatorios():
             elif opcao == "2":
 
                 resultado = (
-                    api_cliente.relatorio_produto_mais_vendido()
+                    api_client.relatorio_produto_mais_vendido()
                 )
 
                 mostrar_dados(resultado)
@@ -662,7 +662,7 @@ def menu_relatorios():
             elif opcao == "3":
 
                 resultado = (
-                    api_cliente.relatorio_vendas_por_produto()
+                    api_client.relatorio_vendas_por_produto()
                 )
 
                 mostrar_dados(resultado)
@@ -672,7 +672,7 @@ def menu_relatorios():
             elif opcao == "4":
 
                 resultado = (
-                    api_cliente.relatorio_movimentacoes()
+                    api_client.relatorio_movimentacoes()
                 )
 
                 mostrar_dados(resultado)
@@ -736,7 +736,7 @@ def menu_principal():
 if __name__ == "__main__":
 
     try:
-        resposta = api_cliente._executar(
+        resposta = api_client._executar(
             "GET",
             "/"
         )

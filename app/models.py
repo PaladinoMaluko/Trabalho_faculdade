@@ -1,37 +1,95 @@
-import sqlalchemy as db
-import sqlalchemy.orm as orm
-engine = db.create_engine('sqlite:///orm_db.db')
-conn = engine.connect()
-Base = orm.declarative_base()
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
 
-class Produto(Base):
+
+class Produto(db.Model):
+    """Representa um produto genérico."""
     __tablename__ = 'produto'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String)
     preco = db.Column(db.Integer)
     # Quantidade de produto
     qtd = db.Column(db.Integer)
-    # Definindo relações (importante: uselist=False -> um produto pode ser apenas um eletronico)
-    eletronico = orm.relationship("Eletronico", back_populates="produto")
 
-class Eletronico(Base):
+    # Definindo relações (importante: um produto pode ser apenas um eletronico)
+    eletronico = db.relationship("Eletronico", back_populates="produto", uselist=False)
+    vendas = db.relationship("Venda", back_populates="produto")
+
+
+class Eletronico(db.Model):
+    """Representa um tipo de produto."""
     __tablename__ = 'eletronico'
     id = db.Column(db.Integer, primary_key=True)
     # Tipo do produto 
-    id_produto = db.Column(db.Integer, db.ForeignKey('Produto.id'))
+    id_produto = db.Column(db.Integer, db.ForeignKey('produto.id'))
     marca = db.Column(db.String)
     modelo = db.Column(db.String)
-    # Definindo relações (importante: uselist=False -> o produto pode )
-    produto = orm.relationship("Produto", back_populates="eletronico", uselist=False)
-    
-class EletroDomestico(Base):
-    __tablename__ = 'eletrodomestico'
+
+    # Definindo relações (importante: um produto pode ser um eletronico ou não)
+    produto = db.relationship("Produto", back_populates="eletronico", uselist=False)
+    # Definindo relações com os subtipos
+    eletronicodomestico = db.relationship("EletronicoDomestico", back_populates="eletronico", uselist=False)
+    eletronicoindustrial = db.relationship("EletronicoIndustrial", back_populates="eletronico", uselist=False)
+    eletronicointeligente = db.relationship("EletronicoInteligente", back_populates="eletronico", uselist=False)
+
+
+# Subcategorias de Eletronicos
+# -----------------------------------------
+class EletronicoDomestico(db.Model):
+    """Representa um subtipo de produto do tipo eletronico."""
+    __tablename__ = 'eletronicodomestico'
     id = db.Column(db.Integer, primary_key=True)
-    id_eletronico = db.Column(db.Integer, db.ForeignKey('Eletronico.id'))
+    id_eletronico = db.Column(db.Integer, db.ForeignKey('eletronico.id'), unique=True)
     cor = db.Column(db.String)
     material = db.Column(db.String)
 
+    # Definindo relações
+    eletronico = db.relationship("Eletronico", back_populates="eletronicodomestico", uselist=False)
 
 
-Base.metadata.create_all(engine)
-Session = orm.sessionmaker(bind=engine)
+class EletronicoIndustrial(db.Model):
+    """Representa um subtipo de produto do tipo eletronico."""
+    __tablename__ = 'eletronicoindustrial'
+    id = db.Column(db.Integer, primary_key=True)
+    id_eletronico = db.Column(db.Integer, db.ForeignKey('eletronico.id'), unique=True)
+    nicho = db.Column(db.String)
+    material = db.Column(db.String)
+
+    # Definindo relações
+    eletronico = db.relationship("Eletronico", back_populates="eletronicoindustrial", uselist=False)
+
+
+class EletronicoInteligente(db.Model):
+    """Representa um subtipo de produto do tipo eletronico."""
+    __tablename__ = 'eletronicointeligente'
+    id = db.Column(db.Integer, primary_key=True)
+    id_eletronico = db.Column(db.Integer, db.ForeignKey('eletronico.id'), unique=True)
+    conectividade = db.Column(db.Boolean)
+
+    # Definindo relações
+    eletronico = db.relationship("Eletronico", back_populates="eletronicointeligente", uselist=False)
+# -----------------------------------------
+
+
+class Registro(db.Model):
+    """Registros dos eventos executados."""
+    __tablename__ = 'registro'
+    id = db.Column(db.Integer, primary_key=True)
+    data_hora = db.Column(db.DateTime, default=db.func.now(), nullable=False)
+    tipo_evento = db.Column(db.String, nullable=False)
+    entidade = db.Column(db.String, nullable=False)
+    id_entidade = db.Column(db.Integer, nullable=False)
+    descricao = db.Column(db.String)
+
+class Venda(db.Model):
+    """Registros das vendas."""
+    __tablename__ = 'venda'
+    id = db.Column(db.Integer, primary_key=True)
+    id_produto = db.Column(db.Integer, db.ForeignKey('produto.id'), nullable=False)
+    quantidade = db.Column(db.Integer, nullable=False)
+    preco_unitario = db.Column(db.Integer, nullable=False)
+    data_venda = db.Column(db.DateTime, default=db.func.now(), nullable=False)
+    valor_total = db.Column(db.Integer)  # opcional
+
+    produto = db.relationship("Produto", back_populates="vendas")
+

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão de Produtos</title>
+  <!-- sua colega vai trabalhar neste arquivo -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Sistema de Gestão de Produtos</h1>
+      <nav>
+        <button @click="aba = 'produtos'" :class="{ ativo: aba === 'produtos' }">
+          Produtos
+        </button>
+        <button @click="aba = 'relatorio'" :class="{ ativo: aba === 'relatorio' }">
+          Relatório
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <p v-if="erro" class="erro">{{ erro }}</p>
+      <section v-show="aba === 'produtos'">
+        <produto-form @criado="carregar"></produto-form>
+        <p v-if="carregando">Carregando produtos...</p>
+        <produto-list
+          v-else
+          :produtos="produtosCompletos"
+          @deletar="deletarProduto"
+          @vender="venderProduto"
+        ></produto-list>
+      </section>
+      <section v-if="aba === 'relatorio'">
+        <relatorio-view></relatorio-view>
+      </section>
+    </main>
+  </div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>  
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="app.js"></script>
+  
+  <script src="ProdutoForm.js"></script>
+  <script src="ProdutoList.js"></script>
+  <script src="RelatorioView.js"></script>
+  
+  <script src="main.js"></script>
+</body>
+</html>

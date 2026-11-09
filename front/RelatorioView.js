@@ -1,4 +1,6 @@
 const RelatorioView = {
+  // ---------- Template (o que aparece na tela) ----------
+  template: '#template-relatorio-view',
   data() {
     return {
       carregando: false,
@@ -145,19 +147,4 @@ const RelatorioView = {
     this.gerar();
   },
 
-  template: `
-    <div class="relatorio">
-      <div class="acoes">
-        <button @click="gerar" :disabled="carregando">
-          {{ carregando ? 'Gerando...' : 'Atualizar' }}
-        </button>
-        <button @click="copiar" :disabled="!markdown">Copiar</button>
-        <button @click="baixar" :disabled="!markdown">Baixar .md</button>
-      </div>
-
-      <p v-if="erro" class="erro">{{ erro }}</p>
-
-      <div v-if="markdown" ref="preview" class="markdown-preview" v-html="parseMarkdown(markdown)"></div>
-    </div>
-  `,
 };

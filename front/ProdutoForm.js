@@ -1,4 +1,6 @@
 const ProdutoForm = {
+  // ---------- Template (o que aparece na tela) ----------
+  template: '#template-produto-form',
   data() {
     return {
       produto: {
@@ -98,70 +100,4 @@ const ProdutoForm = {
       };
     },
   },
-
-  // ---------- Template (o que aparece na tela) ----------
-  // Note o uso de `backticks` (crase) para string multilinha.
-  template: `
-    <form class="produto-form" @submit.prevent="salvar">
-      <h2>Novo Produto</h2>
-
-      <label>
-        Nome
-        <input v-model="produto.nome" required />
-      </label>
-
-      <label>
-        Preço (R$)
-        <input v-model.number="produto.preco" type="number" min="0" step="1" required />
-      </label>
-
-      <label>
-        Quantidade em estoque
-        <input v-model.number="produto.qtd" type="number" min="0" step="1" required />
-      </label>
-
-      <label class="checkbox">
-        <input type="checkbox" v-model="produto.ehEletronico" />
-        É um eletrônico?
-      </label>
-
-      <template v-if="produto.ehEletronico">
-        <label>Marca <input v-model="produto.marca" /></label>
-        <label>Modelo <input v-model="produto.modelo" /></label>
-
-        <label>
-          Subtipo
-          <select v-model="produto.subtipo">
-            <option value="">— nenhum —</option>
-            <option value="domestico">Doméstico</option>
-            <option value="industrial">Industrial</option>
-            <option value="inteligente">Inteligente</option>
-          </select>
-        </label>
-
-        <template v-if="produto.subtipo === 'domestico'">
-          <label>Cor <input v-model="produto.cor" /></label>
-          <label>Material <input v-model="produto.material" /></label>
-        </template>
-
-        <template v-if="produto.subtipo === 'industrial'">
-          <label>Nicho <input v-model="produto.nicho" /></label>
-          <label>Material <input v-model="produto.material" /></label>
-        </template>
-
-        <template v-if="produto.subtipo === 'inteligente'">
-          <label class="checkbox">
-            <input type="checkbox" v-model="produto.conectividade" />
-            Possui conectividade
-          </label>
-        </template>
-      </template>
-
-      <p v-if="erro" class="erro">{{ erro }}</p>
-
-      <button type="submit" :disabled="salvando">
-        {{ salvando ? 'Salvando...' : 'Cadastrar' }}
-      </button>
-    </form>
-  `,
 };

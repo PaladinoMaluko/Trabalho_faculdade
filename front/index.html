@@ -38,6 +38,123 @@
       </section>
     </main>
   </div>
+
+  <template id="template-produto-form">
+    <form class="produto-form" @submit.prevent="salvar">
+      <h2>Novo Produto</h2>
+
+      <label>
+        Nome
+        <input v-model="produto.nome" required />
+      </label>
+
+      <label>
+        Preço (R$)
+        <input v-model.number="produto.preco" type="number" min="0" step="1" required />
+      </label>
+
+      <label>
+        Quantidade em estoque
+        <input v-model.number="produto.qtd" type="number" min="0" step="1" required />
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" v-model="produto.ehEletronico" />
+        É um eletrônico?
+      </label>
+
+      <template v-if="produto.ehEletronico">
+        <label>Marca <input v-model="produto.marca" /></label>
+        <label>Modelo <input v-model="produto.modelo" /></label>
+
+        <label>
+          Subtipo
+          <select v-model="produto.subtipo">
+            <option value="">— nenhum —</option>
+            <option value="domestico">Doméstico</option>
+            <option value="industrial">Industrial</option>
+            <option value="inteligente">Inteligente</option>
+          </select>
+        </label>
+
+        <template v-if="produto.subtipo === 'domestico'">
+          <label>Cor <input v-model="produto.cor" /></label>
+          <label>Material <input v-model="produto.material" /></label>
+        </template>
+
+        <template v-if="produto.subtipo === 'industrial'">
+          <label>Nicho <input v-model="produto.nicho" /></label>
+          <label>Material <input v-model="produto.material" /></label>
+        </template>
+
+        <template v-if="produto.subtipo === 'inteligente'">
+          <label class="checkbox">
+            <input type="checkbox" v-model="produto.conectividade" />
+            Possui conectividade
+          </label>
+        </template>
+      </template>
+
+      <p v-if="erro" class="erro">{{ erro }}</p>
+
+      <button type="submit" :disabled="salvando">
+        {{ salvando ? 'Salvando...' : 'Cadastrar' }}
+      </button>
+    </form>
+  </template>
+
+  <template id="template-produto-list">
+    <div class="produto-list">
+        <h2>Produtos cadastrados</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Tipo</th>
+              <th>Preço</th>
+              <th>Estoque</th>
+              <th>Detalhes</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="p in produtos" :key="p.id">
+              <td>{{ p.id }}</td>
+              <td>{{ p.nome }}</td>
+              <td>{{ tipo(p) }}</td>
+              <td>{{ moeda(p.preco) }}</td>
+              <td>{{ p.qtd }}</td>
+              <td>{{ detalhes(p) }}</td>
+              <td class="acoes-celula">
+                <button @click="$emit('vender', p)">Vender</button>
+                <button class="perigo" @click="$emit('deletar', p)">Excluir</button>
+              </td>
+            </tr>
+            <tr v-if="produtos.length === 0">
+              <td colspan="7" class="vazio">Nenhum produto cadastrado ainda.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
+
+    <template id="template-relatorio-view">
+      <div class="relatorio">
+        <div class="acoes">
+          <button @click="gerar" :disabled="carregando">
+            {{ carregando ? 'Gerando...' : 'Atualizar' }}
+          </button>
+          <button @click="copiar" :disabled="!markdown">Copiar</button>
+          <button @click="baixar" :disabled="!markdown">Baixar .md</button>
+        </div>
+
+        <p v-if="erro" class="erro">{{ erro }}</p>
+
+        <div v-if="markdown" ref="preview" class="markdown-preview" v-html="parseMarkdown(markdown)"></div>
+      </div>
+    </template>
+
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>  
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="app.js"></script>

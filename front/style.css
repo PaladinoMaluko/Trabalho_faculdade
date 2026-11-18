@@ -1,15 +1,15 @@
-/* =========================
+/* 
    RESET
-========================= */
+*/
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* =========================
+/* 
    VARIÁVEIS
-========================= */
+ */
 :root {
     --cor-primaria: #2563eb;
     --cor-primaria-hover: #1d4ed8;
@@ -28,9 +28,9 @@
     --radius: 12px;
 }
 
-/* =========================
+/* 
    BODY
-========================= */
+ */
 body {
     font-family: Arial, Helvetica, sans-serif;
     background-color: var(--cor-fundo);
@@ -38,9 +38,9 @@ body {
     min-height: 100vh;
 }
 
-/* =========================
+/* 
    HEADER
-========================= */
+ */
 header {
     background-color: var(--cor-card);
     padding: 24px 40px;
@@ -58,9 +58,9 @@ header h1 {
     color: var(--cor-texto);
 }
 
-/* =========================
+/* 
    NAV
-========================= */
+ */
 nav {
     display: flex;
     align-items: center;
@@ -97,34 +97,34 @@ nav button.ativo:hover {
     background-color: var(--cor-primaria-hover);
 }
 
-/* =========================
+/* 
    MAIN
-========================= */
+ */
 main {
     max-width: 1400px;
     margin: 0 auto;
     padding: 35px 40px;
 }
 
-/* =========================
+/* 
    SEÇÕES
-========================= */
+ */
 main section {
     margin-bottom: 30px;
 }
 
-/* =========================
+/* 
    TÍTULOS
-========================= */
+ */
 h2 {
     font-size: 20px;
     margin-bottom: 20px;
     color: var(--cor-texto);
 }
 
-/* =========================
+/* 
    FORMULÁRIO
-========================= */
+ */
 .produto-form {
     background-color: var(--cor-card);
 
@@ -188,9 +188,9 @@ h2 {
     width: auto;
 }
 
-/* =========================
+/* 
    BOTÕES
-========================= */
+ */
 button {
     cursor: pointer;
     transition: 0.2s;
@@ -213,9 +213,9 @@ button {
     background-color: var(--cor-primaria-hover);
 }
 
-/* =========================
+/* 
    LISTA DE PRODUTOS
-========================= */
+ */
 .produto-list {
     background-color: var(--cor-card);
 
@@ -231,9 +231,9 @@ button {
     margin-bottom: 24px;
 }
 
-/* =========================
+/* 
    TABELA
-========================= */
+ */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -274,9 +274,9 @@ tbody tr:hover {
     color: var(--cor-texto-secundario);
 }
 
-/* =========================
+/* 
    BOTÕES DA TABELA
-========================= */
+ */
 .acoes-celula {
     display: flex;
     gap: 8px;
@@ -308,9 +308,9 @@ tbody tr:hover {
     background-color: #fee2e2;
 }
 
-/* =========================
+/* 
    ERROS
-========================= */
+ */
 .erro {
     color: var(--cor-perigo);
     background-color: #fef2f2;
@@ -321,9 +321,9 @@ tbody tr:hover {
     margin-bottom: 20px;
 }
 
-/* =========================
+/* 
    RELATÓRIO
-========================= */
+ */
 .relatorio {
     background-color: var(--cor-card);
 
@@ -360,9 +360,9 @@ tbody tr:hover {
     cursor: not-allowed;
 }
 
-/* =========================
+/* 
    RESPONSIVIDADE
-========================= */
+ */
 @media (max-width: 768px) {
 
     header {
@@ -393,9 +393,9 @@ tbody tr:hover {
 }
 
 
-/* =========================
+/* 
    DASHBOARD DE RELATÓRIOS
-========================= */
+ */
 
 .relatorio-dashboard {
     display: flex;

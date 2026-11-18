@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestão de Produtos</title>
   <!-- sua colega vai trabalhar neste arquivo -->
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/front/style.css" />
 </head>
 <body>
   <div id="app">
@@ -27,11 +27,11 @@
         <produto-form @criado="carregar"></produto-form>
         <p v-if="carregando">Carregando produtos...</p>
         <produto-list
-          v-else
-          :produtos="produtosCompletos"
-          @deletar="deletarProduto"
-          @vender="venderProduto"
-        ></produto-list>
+  :produtos="produtosCompletos"
+  @vender="venderProduto"
+  @deletar="deletarProduto"
+  @adicionar-estoque="adicionarEstoque">
+</produto-list>
       </section>
       <section v-if="aba === 'relatorio'">
         <relatorio-view></relatorio-view>
@@ -127,9 +127,9 @@
               <td>{{ p.qtd }}</td>
               <td>{{ detalhes(p) }}</td>
               <td class="acoes-celula">
-                <button @click="$emit('vender', p)">Vender</button>
-                <button class="perigo" @click="$emit('deletar', p)">Excluir</button>
-              </td>
+  <button @click="$emit('vender', p)">Vender</button>
+  <button class="perigo" @click="$emit('deletar', p)">Excluir</button>
+</td>
             </tr>
             <tr v-if="produtos.length === 0">
               <td colspan="7" class="vazio">Nenhum produto cadastrado ainda.</td>
@@ -139,29 +139,225 @@
       </div>
     </template>
 
-    <template id="template-relatorio-view">
-      <div class="relatorio">
-        <div class="acoes">
-          <button @click="gerar" :disabled="carregando">
-            {{ carregando ? 'Gerando...' : 'Atualizar' }}
-          </button>
-          <button @click="copiar" :disabled="!markdown">Copiar</button>
-          <button @click="baixar" :disabled="!markdown">Baixar .md</button>
+    
+<template id="template-relatorio-view">
+  <div class="relatorio-dashboard">
+
+    <!-- CABEÇALHO -->
+    <div class="relatorio-header">
+      <div>
+        <h2>Relatório de desempenho</h2>
+        <p>Resumo geral do catálogo e das vendas</p>
+        <span v-if="dataGeracao" class="data-geracao">
+          Atualizado em {{ dataGeracao }}
+        </span>
+      </div>
+
+      <div class="relatorio-acoes">
+        <button @click="gerar" :disabled="carregando">
+          {{ carregando ? 'Atualizando...' : 'Atualizar' }}
+        </button>
+
+        <button class="btn-exportar" @click="exportarPDF">
+          Exportar PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- ERRO -->
+    <p v-if="erro" class="erro">
+      {{ erro }}
+    </p>
+
+    <!-- CARREGANDO -->
+    <div v-if="carregando" class="relatorio-loading">
+      Carregando dados do relatório...
+    </div>
+
+    <template v-else>
+
+      <!-- INDICADORES -->
+      <div class="relatorio-cards">
+
+        <div class="relatorio-card">
+          <div class="card-info">
+            <span class="card-titulo">Produtos cadastrados</span>
+            <strong>{{ totalProdutos }}</strong>
+            <span class="card-descricao">Total no catálogo</span>
+          </div>
+          <div class="card-icone azul">📦</div>
         </div>
 
-        <p v-if="erro" class="erro">{{ erro }}</p>
+        <div class="relatorio-card">
+          <div class="card-info">
+            <span class="card-titulo">Faturamento total</span>
+            <strong>{{ moeda(faturamento) }}</strong>
+            <span class="card-descricao">Vendas registradas</span>
+          </div>
+          <div class="card-icone verde">💰</div>
+        </div>
 
-        <div v-if="markdown" ref="preview" class="markdown-preview" v-html="parseMarkdown(markdown)"></div>
+        <div class="relatorio-card">
+          <div class="card-info">
+            <span class="card-titulo">Unidades vendidas</span>
+            <strong>{{ totalUnidadesVendidas }}</strong>
+            <span class="card-descricao">Total de unidades</span>
+          </div>
+          <div class="card-icone roxo">📈</div>
+        </div>
+
+        <div class="relatorio-card">
+          <div class="card-info">
+            <span class="card-titulo">Produtos eletrônicos</span>
+            <strong>{{ totalEletronicos }}</strong>
+            <span class="card-descricao">Itens eletrônicos</span>
+          </div>
+          <div class="card-icone laranja">💻</div>
+        </div>
+
       </div>
-    </template>
 
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>  
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="app.js"></script>
-  
-  <script src="ProdutoForm.js"></script>
-  <script src="ProdutoList.js"></script>
-  <script src="RelatorioView.js"></script>
+      <!-- CONTEÚDO PRINCIPAL -->
+      <div class="relatorio-grid">
+
+        <!-- PRODUTO MAIS VENDIDO -->
+        <div class="relatorio-bloco destaque-produto">
+          <h3>Produto mais vendido</h3>
+
+          <div v-if="maisVendido && maisVendido.nome" class="produto-destaque">
+            <div class="produto-destaque-icone">🏆</div>
+
+            <div>
+              <h4>{{ maisVendido.nome }}</h4>
+              <p>ID do produto: {{ maisVendido.id }}</p>
+            </div>
+          </div>
+
+          <div v-if="maisVendido && maisVendido.nome" class="produto-metricas">
+            <div>
+              <span>Unidades vendidas</span>
+              <strong>{{ maisVendido.total_vendido }}</strong>
+            </div>
+
+            <div>
+              <span>Faturamento gerado</span>
+              <strong>{{ moeda(maisVendido.faturamento) }}</strong>
+            </div>
+          </div>
+
+          <p v-else class="relatorio-vazio">
+            Nenhuma venda registrada.
+          </p>
+        </div>
+
+        <!-- RESUMO ELETRÔNICOS -->
+        <div class="relatorio-bloco">
+          <h3>Resumo de eletrônicos</h3>
+
+          <div class="eletronicos-lista">
+            <div class="eletronico-item">
+              <span>Domésticos</span>
+              <strong>{{ totalDomesticos }}</strong>
+            </div>
+
+            <div class="eletronico-item">
+              <span>Industriais</span>
+              <strong>{{ totalIndustriais }}</strong>
+            </div>
+
+            <div class="eletronico-item">
+              <span>Inteligentes</span>
+              <strong>{{ totalInteligentes }}</strong>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- VENDAS POR PRODUTO -->
+      <div class="relatorio-bloco tabela-relatorio">
+        <div class="bloco-header">
+          <div>
+            <h3>Vendas por produto</h3>
+            <p>Desempenho individual dos produtos</p>
+          </div>
+        </div>
+
+        <div class="tabela-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Unidades vendidas</th>
+                <th>Faturamento</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr v-for="v in vendasPorProduto" :key="v.id">
+                <td>{{ v.nome }}</td>
+                <td>{{ v.total_vendido }}</td>
+                <td>{{ moeda(v.faturamento) }}</td>
+              </tr>
+
+              <tr v-if="vendasPorProduto.length === 0">
+                <td colspan="3" class="relatorio-vazio">
+                  Nenhuma venda registrada.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MOVIMENTAÇÕES -->
+      <div class="relatorio-bloco tabela-relatorio">
+        <div class="bloco-header">
+          <div>
+            <h3>Movimentações do sistema</h3>
+            <p>Quantidade de eventos por tipo</p>
+          </div>
+        </div>
+
+        <div class="tabela-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Tipo de movimentação</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr v-for="m in movimentacoes" :key="m.tipo_evento">
+                <td>{{ m.tipo_evento }}</td>
+                <td>{{ m.total }}</td>
+              </tr>
+
+              <tr v-if="movimentacoes.length === 0">
+                <td colspan="2" class="relatorio-vazio">
+                  Nenhuma movimentação registrada.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </template>
+  </div>
+</template>
+
+
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script src="/front/app.js"></script>
+<script src="/front/ProdutoForm.js"></script>
+<script src="/front/ProdutoList.js"></script>
+<script src="/front/RelatorioView.js"></script>
+<script src="/front/main.js"></script>
   
   <script src="main.js"></script>
 </body>

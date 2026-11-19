@@ -516,35 +516,60 @@ def criar_venda():
     dados = request.get_json()
 
     if not dados:
-        return jsonify({"erro": "JSON não informado"}, 400)
+        return jsonify({"erro": "JSON não informado"}), 400
 
     if "id_produto" not in dados or "quantidade" not in dados or "preco_unitario" not in dados:
         return jsonify({"erro": "Os campos são obrigatórios"}), 400
 
-    # Verifica se existe um produto 
+    # Verifica se o produto existe
     id_produto = dados["id_produto"]
     produto, erro = buscar_produto_ou_erro(id_produto)
+
     if erro:
         return erro
-    
-    if dados["quantidade"] <= 0 or dados["preco_unitario"] <= 0:
+
+    # Valida quantidade e preço
+    try:
+        quantidade = int(dados["quantidade"])
+        preco_unitario = float(dados["preco_unitario"])
+    except (ValueError, TypeError):
+        return jsonify({"erro": "Quantidade e preço inválidos"}), 400
+
+    if quantidade <= 0 or preco_unitario <= 0:
         return jsonify({"erro": "Quantidade e preço devem ser maiores que zero"}), 400
 
-    venda = Venda(id_produto=id_produto, quantidade=dados["quantidade"], preco_unitario=dados["preco_unitario"], valor_total=dados["quantidade"] * dados["preco_unitario"])
+    # Verifica o estoque disponível
+    if quantidade > produto.qtd:
+        return jsonify({
+            "erro": f"Estoque insuficiente. Disponível: {produto.qtd} unidade(s)."
+        }), 400
+
+    valor_total = quantidade * preco_unitario
+
+    venda = Venda(
+        id_produto=id_produto,
+        quantidade=quantidade,
+        preco_unitario=preco_unitario,
+        valor_total=valor_total
+    )
 
     try:
-        db.session.add(venda)
-        db.session.flush()   
+        # Desconta o estoque
+        produto.qtd -= quantidade
 
-        # Registrando a venda
+        db.session.add(venda)
+        db.session.flush()
+
+        # Registra a venda
         criar_registro(
             tipo_evento="VENDA",
             entidade="Venda",
             id_entidade=venda.id,
-            descricao=f"Venda de {dados['quantidade']}x {produto.nome} por R$ {venda.valor_total}"
+            descricao=f"Venda de {quantidade}x {produto.nome} por R$ {venda.valor_total}"
         )
 
         db.session.commit()
+
     except Exception as e:
         db.session.rollback()
         print(f"Erro ao criar venda: {e}")
@@ -555,14 +580,23 @@ def criar_venda():
 @bp.route("/vendas/<int:id>", methods=["DELETE"])
 def excluir_venda(id):
     """Rota para excluir uma venda existente"""
+
     venda, erro = buscar_venda_ou_erro(id)
-        
+
+    if erro:
+        return erro
+
+    # Busca o produto relacionado à venda
+    produto, erro = buscar_produto_ou_erro(venda.id_produto)
+
     if erro:
         return erro
 
     try:
+        # Devolve as unidades ao estoque
+        produto.qtd += venda.quantidade
 
-        # Registrando o cancelamento da venda
+        # Registra o cancelamento
         criar_registro(
             tipo_evento="CANCELAMENTO",
             entidade="Venda",
@@ -572,11 +606,11 @@ def excluir_venda(id):
 
         db.session.delete(venda)
         db.session.commit()
+
     except Exception as e:
         db.session.rollback()
         print(f"Erro ao deletar venda: {e}")
         return jsonify({"erro": "Erro interno ao deletar venda"}), 500
-    
 
     return jsonify({"mensagem": "Venda excluída com sucesso"}), 200
 

@@ -1,0 +1,789 @@
+/* 
+   RESET
+*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 
+   VARIÁVEIS
+ */
+:root {
+    --cor-primaria: #2563eb;
+    --cor-primaria-hover: #1d4ed8;
+
+    --cor-fundo: #f1f5f9;
+    --cor-card: #ffffff;
+
+    --cor-texto: #1e293b;
+    --cor-texto-secundario: #64748b;
+
+    --cor-borda: #e2e8f0;
+
+    --cor-sucesso: #16a34a;
+    --cor-perigo: #dc2626;
+
+    --radius: 12px;
+}
+
+/* 
+   BODY
+ */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    min-height: 100vh;
+}
+
+/* 
+   HEADER
+ */
+header {
+    background-color: var(--cor-card);
+    padding: 24px 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--cor-texto);
+}
+
+/* 
+   NAV
+ */
+nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+nav button {
+    border: none;
+    background: transparent;
+
+    padding: 12px 20px;
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    color: var(--cor-texto-secundario);
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+nav button:hover {
+    background-color: #eff6ff;
+    color: var(--cor-primaria);
+}
+
+nav button.ativo {
+    background-color: var(--cor-primaria);
+    color: white;
+}
+
+nav button.ativo:hover {
+    background-color: var(--cor-primaria-hover);
+}
+
+/* 
+   MAIN
+ */
+main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 35px 40px;
+}
+
+/* 
+   SEÇÕES
+ */
+main section {
+    margin-bottom: 30px;
+}
+
+/* 
+   TÍTULOS
+ */
+h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: var(--cor-texto);
+}
+
+/* 
+   FORMULÁRIO
+ */
+.produto-form {
+    background-color: var(--cor-card);
+
+    padding: 28px;
+    border-radius: var(--radius);
+
+    border: 1px solid var(--cor-borda);
+
+    margin-bottom: 30px;
+}
+
+.produto-form h2 {
+    margin-bottom: 24px;
+}
+
+.produto-form label {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-bottom: 18px;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.produto-form input,
+.produto-form select {
+    width: 100%;
+
+    padding: 12px 14px;
+
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+
+    background-color: #ffffff;
+
+    font-size: 14px;
+    color: var(--cor-texto);
+
+    outline: none;
+    transition: 0.2s;
+}
+
+.produto-form input:focus,
+.produto-form select:focus {
+    border-color: var(--cor-primaria);
+
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* CHECKBOX */
+.produto-form label.checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.produto-form label.checkbox input {
+    width: auto;
+}
+
+/* 
+   BOTÕES
+ */
+button {
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.produto-form button {
+    background-color: var(--cor-primaria);
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    padding: 12px 20px;
+
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.produto-form button:hover {
+    background-color: var(--cor-primaria-hover);
+}
+
+/* 
+   LISTA DE PRODUTOS
+ */
+.produto-list {
+    background-color: var(--cor-card);
+
+    padding: 28px;
+
+    border-radius: var(--radius);
+    border: 1px solid var(--cor-borda);
+
+    overflow-x: auto;
+}
+
+.produto-list h2 {
+    margin-bottom: 24px;
+}
+
+/* 
+   TABELA
+ */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+thead {
+    background-color: #f8fafc;
+}
+
+th {
+    padding: 16px;
+    text-align: left;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    color: var(--cor-texto-secundario);
+
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+td {
+    padding: 16px;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.vazio {
+    text-align: center;
+    padding: 40px;
+    color: var(--cor-texto-secundario);
+}
+
+/* 
+   BOTÕES DA TABELA
+ */
+.acoes-celula {
+    display: flex;
+    gap: 8px;
+}
+
+.acoes-celula button {
+    padding: 8px 12px;
+
+    border: none;
+    border-radius: 6px;
+
+    background-color: #eff6ff;
+    color: var(--cor-primaria);
+
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.acoes-celula button:hover {
+    background-color: #dbeafe;
+}
+
+.acoes-celula button.perigo {
+    background-color: #fef2f2;
+    color: var(--cor-perigo);
+}
+
+.acoes-celula button.perigo:hover {
+    background-color: #fee2e2;
+}
+
+/* 
+   ERROS
+ */
+.erro {
+    color: var(--cor-perigo);
+    background-color: #fef2f2;
+
+    padding: 12px 16px;
+
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* 
+   RELATÓRIO
+ */
+.relatorio {
+    background-color: var(--cor-card);
+
+    padding: 28px;
+
+    border-radius: var(--radius);
+    border: 1px solid var(--cor-borda);
+}
+
+.relatorio .acoes {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.relatorio .acoes button {
+    padding: 10px 16px;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: var(--cor-primaria);
+    color: white;
+
+    font-weight: 600;
+}
+
+.relatorio .acoes button:hover {
+    background-color: var(--cor-primaria-hover);
+}
+
+.relatorio .acoes button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 
+   RESPONSIVIDADE
+ */
+@media (max-width: 768px) {
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+
+        padding: 20px;
+    }
+
+    header h1 {
+        font-size: 20px;
+    }
+
+    main {
+        padding: 20px;
+    }
+
+    .produto-form,
+    .produto-list,
+    .relatorio {
+        padding: 20px;
+    }
+
+    .relatorio .acoes {
+        flex-wrap: wrap;
+    }
+}
+
+
+/* 
+   DASHBOARD DE RELATÓRIOS
+ */
+
+.relatorio-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* CABEÇALHO */
+
+.relatorio-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.relatorio-header h2 {
+    font-size: 26px;
+    margin-bottom: 8px;
+}
+
+.relatorio-header p {
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
+}
+
+.data-geracao {
+    display: block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
+}
+
+.relatorio-acoes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.relatorio-acoes button {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 18px;
+    background: #eaf1ff;
+    color: var(--cor-primaria);
+    font-weight: 600;
+}
+
+.relatorio-acoes button:hover {
+    background: #dbeafe;
+}
+
+.relatorio-acoes button.btn-exportar {
+    background: var(--cor-primaria);
+    color: white;
+}
+
+.relatorio-acoes button.btn-exportar:hover {
+    background: var(--cor-primaria-hover);
+}
+
+/* CARDS */
+
+.relatorio-cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.relatorio-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+
+    background: white;
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+
+    padding: 24px;
+
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.relatorio-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+.card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.card-titulo {
+    font-size: 13px;
+    color: var(--cor-texto-secundario);
+}
+
+.card-info strong {
+    font-size: 25px;
+    color: var(--cor-texto);
+}
+
+.card-descricao {
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
+}
+
+.card-icone {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+    font-size: 21px;
+}
+
+.card-icone.azul {
+    background: #eff6ff;
+}
+
+.card-icone.verde {
+    background: #f0fdf4;
+}
+
+.card-icone.roxo {
+    background: #f5f3ff;
+}
+
+.card-icone.laranja {
+    background: #fff7ed;
+}
+
+/* GRID DE BLOCOS */
+
+.relatorio-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 20px;
+}
+
+.relatorio-bloco {
+    background: white;
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.relatorio-bloco h3 {
+    font-size: 17px;
+    margin-bottom: 20px;
+}
+
+.bloco-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.bloco-header h3 {
+    margin-bottom: 6px;
+}
+
+.bloco-header p {
+    font-size: 13px;
+    color: var(--cor-texto-secundario);
+}
+
+/* PRODUTO MAIS VENDIDO */
+
+.produto-destaque {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 18px;
+}
+
+.produto-destaque-icone {
+    width: 50px;
+    height: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #eff6ff;
+    border-radius: 12px;
+    font-size: 24px;
+}
+
+.produto-destaque h4 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.produto-destaque p {
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
+}
+
+.produto-metricas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.produto-metricas div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.produto-metricas span {
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
+}
+
+.produto-metricas strong {
+    font-size: 18px;
+    color: var(--cor-texto);
+}
+
+/* ELETRÔNICOS */
+
+.eletronicos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.eletronico-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 14px 0;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.eletronico-item:last-child {
+    border-bottom: none;
+}
+
+.eletronico-item span {
+    font-size: 14px;
+    color: var(--cor-texto-secundario);
+}
+
+.eletronico-item strong {
+    background: #eff6ff;
+    color: var(--cor-primaria);
+
+    padding: 6px 12px;
+    border-radius: 8px;
+
+    font-size: 14px;
+}
+
+/* TABELAS DO RELATÓRIO */
+
+.tabela-relatorio {
+    width: 100%;
+}
+
+.tabela-scroll {
+    overflow-x: auto;
+}
+
+.tabela-relatorio table {
+    width: 100%;
+    min-width: 500px;
+}
+
+.tabela-relatorio th {
+    background: #f8fafc;
+}
+
+.tabela-relatorio td,
+.tabela-relatorio th {
+    padding: 15px 16px;
+}
+
+.relatorio-vazio {
+    text-align: center;
+    padding: 30px;
+    color: var(--cor-texto-secundario);
+}
+
+/* LOADING */
+
+.relatorio-loading {
+    background: white;
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    color: var(--cor-texto-secundario);
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 1100px) {
+    .relatorio-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 850px) {
+    .relatorio-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .relatorio-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .relatorio-header h2 {
+        font-size: 22px;
+    }
+
+    .relatorio-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .relatorio-card {
+        padding: 18px;
+    }
+
+    .relatorio-bloco {
+        padding: 18px;
+    }
+
+    .produto-metricas {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+    body {
+        background: white !important;
+    }
+
+    header {
+        display: none !important;
+    }
+
+    main {
+        max-width: 100%;
+        padding: 0 !important;
+    }
+
+    .relatorio-acoes {
+        display: none !important;
+    }
+
+    .relatorio-dashboard {
+        gap: 16px;
+    }
+
+    .relatorio-card,
+    .relatorio-bloco {
+        box-shadow: none !important;
+        break-inside: avoid;
+    }
+
+    .relatorio-card {
+        border: 1px solid #ddd;
+    }
+
+    .relatorio-bloco {
+        margin-bottom: 12px;
+    }
+
+    body {
+        color: #111827 !important;
+    }
+}

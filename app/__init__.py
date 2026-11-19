@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS  
 from app.models import (db, Produto, Eletronico, 
                     EletronicoDomestico, EletronicoInteligente, 
                     EletronicoIndustrial, Registro,
@@ -8,6 +9,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///banco.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config["SQLALCHEMY_ECHO"] = True
+
+CORS(app) 
 
 db.init_app(app)
 
